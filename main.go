@@ -33,6 +33,9 @@ var (
 	// set, the default is used
 	Opt4 = false
 	Opt6 = false
+
+	// OptDebug denables debugging
+	OptDebug = true
 )
 
 // usage prints detailed usage and exits
@@ -152,4 +155,5 @@ func optParse() {
 // The main function
 func main() {
 	optParse()
+	IfAddrs()
 }
