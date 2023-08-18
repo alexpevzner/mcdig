@@ -57,6 +57,7 @@ func usage() {
 		""
 
 	fmt.Print(help)
+	os.Exit(0)
 }
 
 // usageError prints usage error and exits
