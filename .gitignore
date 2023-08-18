@@ -9,6 +9,9 @@ mdig
 *.so
 *.dylib
 
+# VIM temporary files
+.*.swp
+
 # Test binary, built with `go test -c`
 *.test
 
