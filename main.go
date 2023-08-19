@@ -10,6 +10,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -35,8 +36,12 @@ var (
 	Opt4 = false
 	Opt6 = false
 
-	// OptRetransmitInterval specifies MDNS query retransmit interval
-	OptRetransmitInterval = 250 * time.Millisecond
+	// OptTxPeriod specifies MDNS query retransmit interval
+	OptTxPeriod = 250 * time.Millisecond
+
+	// OptTxCount specifies how many MDNS queries will be
+	// sent before completion
+	OptTxCount = 10
 
 	// OptQueryTime specifies the whole query wait time
 	OptQueryTime = 2500 * time.Millisecond
@@ -62,14 +67,16 @@ func usage() {
 		"If missed, all active interfaces are used\n" +
 		"\n" +
 		"Options are:\n" +
-		"    -4 use IPv4 (the default, may be combined with -6)\n" +
-		"    -6 use IPv6 (may be combined with -4)\n" +
-		"    -d enable debugging\n" +
-		"    -v enable verbose debugging\n" +
+		"    -4         use IPv4 (the default, may be combined with -6)\n" +
+		"    -6         use IPv6 (may be combined with -4)\n" +
+		"    -d         enable debugging\n" +
+		"    -v         enable verbose debugging\n" +
+		"    -p period  MDNS query period, milliseconds (default is %d)\n" +
+		"    -c count   MDNS query count, before exit (default is %d)\n" +
 		"    -h print help screen and exit\n" +
 		""
 
-	fmt.Print(help)
+	fmt.Printf(help, OptTxPeriod/time.Millisecond, OptTxCount)
 	os.Exit(0)
 }
 
@@ -88,11 +95,15 @@ func optParse() {
 	}
 
 	// Split command line into position arguments and options
+	type option struct{ Name, Val string }
+
 	args := []string{}
-	opts := []string{}
+	opts := []option{}
 	endOfOptions := false
 
-	for _, arg := range os.Args[1:] {
+	for i := 1; i < len(os.Args); i++ {
+		arg := os.Args[i]
+
 		switch {
 		case endOfOptions:
 			args = append(args, arg)
@@ -103,8 +114,16 @@ func optParse() {
 		case arg == "-h":
 			usage()
 
+		case arg == "-p" || arg == "-c":
+			if i+1 == len(os.Args) {
+				usageError("option %s requires argument", arg)
+			}
+			opts = append(opts,
+				option{Name: arg, Val: os.Args[i+1]})
+			i++
+
 		case strings.HasPrefix(arg, "-") || strings.HasPrefix(arg, "@"):
-			opts = append(opts, arg)
+			opts = append(opts, option{Name: arg})
 
 		default:
 			args = append(args, arg)
@@ -142,21 +161,39 @@ func optParse() {
 	// Handle options
 	for _, opt := range opts {
 		switch {
-		case opt == "-4":
+		case opt.Name == "-4":
 			Opt4 = true
 
-		case opt == "-6":
+		case opt.Name == "-6":
 			Opt6 = true
 
-		case opt == "-d":
+		case opt.Name == "-d":
 			OptDebug = true
 
-		case opt == "-v":
+		case opt.Name == "-v":
 			OptVerbose = true
 
-		case strings.HasPrefix(opt, "@"):
+		case opt.Name == "-p" || opt.Name == "-c":
+			val, err := strconv.ParseUint(opt.Val, 0, 31)
+			if err != nil {
+				usageError("invalid argument: %s %s",
+					opt.Name, opt.Val)
+			}
+
+			switch opt.Name {
+			case "-p":
+				OptTxPeriod = time.Duration(val) *
+					time.Millisecond
+			case "-c":
+				OptTxCount = int(val)
+
+			default:
+				panic("internal error")
+			}
+
+		case strings.HasPrefix(opt.Name, "@"):
 			if OptIface == "" {
-				OptIface = opt[1:]
+				OptIface = opt.Name[1:]
 			} else {
 				usageError("Duplicated @interface")
 			}

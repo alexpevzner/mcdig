@@ -99,11 +99,9 @@ func QueryRun() {
 	}
 
 	// Begin sending queries until time is expired
-	tmRxmt := time.NewTicker(OptRetransmitInterval)
-	tmDone := time.NewTimer(OptQueryTime)
-	done := false
+	tmCount := OptTxCount
 
-	for !done {
+	for tmCount > 0 {
 		for _, conn := range conns {
 			if AddrIs4(conn.LocalAddr().(*net.UDPAddr).IP) {
 				conn.WriteToUDP(rqBytes, mcast4)
@@ -112,11 +110,8 @@ func QueryRun() {
 			}
 		}
 
-		select {
-		case <-tmRxmt.C:
-		case <-tmDone.C:
-			done = true
-		}
+		tmCount--
+		time.Sleep(OptTxPeriod)
 	}
 }
 
