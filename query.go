@@ -9,7 +9,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"net"
+	"sync"
 	"syscall"
 	"time"
 
@@ -86,12 +88,16 @@ func QueryRun() []dns.Question {
 	}
 
 	// Start receivers
+	var wait sync.WaitGroup
+
 	for _, conn := range conns {
-		go queryRecv(conn)
+		wait.Add(1)
+		go queryRecv(conn, &wait)
 	}
 
 	for _, conn := range mconns {
-		go queryRecv(conn)
+		wait.Add(1)
+		go queryRecv(conn, &wait)
 	}
 
 	// Create DNS query message
@@ -116,6 +122,17 @@ func QueryRun() []dns.Question {
 		tmCount--
 		time.Sleep(OptTxPeriod)
 	}
+
+	// Close all connections and wait for receivers termination
+	for _, conn := range conns {
+		conn.Close()
+	}
+
+	for _, conn := range mconns {
+		conn.Close()
+	}
+
+	wait.Wait()
 
 	return rq.Question
 }
@@ -152,13 +169,18 @@ func queryNewRequest() *dns.Msg {
 
 // queryRecv runs on its own goroutine and receives and handles
 // all UDP datagrams, received from connection
-func queryRecv(conn *net.UDPConn) {
+func queryRecv(conn *net.UDPConn, wait *sync.WaitGroup) {
+	defer wait.Done()
+
 	buf := make([]byte, 65536)
 
 	for {
 		// Receive the message
 		n, from, err := conn.ReadFromUDP(buf)
 		if err != nil {
+			if errors.Is(err, net.ErrClosed) {
+				return
+			}
 			continue
 		}
 
