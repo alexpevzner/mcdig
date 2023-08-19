@@ -136,7 +136,11 @@ func queryNewRequest() *dns.Msg {
 	rq.Id = dns.Id()
 	rq.RecursionDesired = false
 	rq.Question = make([]dns.Question, 1)
-	rq.Question[0] = dns.Question{fqdn, OptQType, OptQClass}
+	rq.Question[0] = dns.Question{
+		Name:   fqdn,
+		Qtype:  OptQType,
+		Qclass: OptQClass,
+	}
 
 	return rq
 }
