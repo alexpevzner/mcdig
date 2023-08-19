@@ -16,7 +16,12 @@ import "net"
 //   * OptIface
 //   * Opt4
 //   * Opt6
-func IfAddrs() []*net.UDPAddr {
+//
+// It returns (filtered, according to options) list of addresses
+// and two lists of network interfaces: one for IPv4 and one for
+// IPv6. Note, interfaces are only included into the list if they
+// are really in use, after address filtering
+func IfAddrs() (addrs []*net.UDPAddr, if4, if6 []net.Interface) {
 	// Obtain list of network interfaces
 	interfaces, err := net.Interfaces()
 	if err != nil {
@@ -39,8 +44,11 @@ func IfAddrs() []*net.UDPAddr {
 		}
 	}
 
-	// Build list of addresses
-	addrs := []*net.UDPAddr{}
+	// Build list of addresses and interfaces
+	addrs = []*net.UDPAddr{}
+	if4seen := make(map[int]bool)
+	if6seen := make(map[int]bool)
+
 	for _, iface := range interfaces {
 		ifaddrs, err := iface.Addrs()
 		if err != nil {
@@ -75,14 +83,24 @@ func IfAddrs() []*net.UDPAddr {
 
 			}
 
-			// Add address to the list
+			// Add address and interface to the list
 			if ip != nil {
-				LogDebug("Using local IP address: %s", ip)
 				addr := &net.UDPAddr{
 					IP:   ip,
+					Port: 5353,
 					Zone: iface.Name,
 				}
 				addrs = append(addrs, addr)
+
+				switch {
+				case ip4 != nil && !if4seen[iface.Index]:
+					if4 = append(if4, iface)
+					if4seen[iface.Index] = true
+
+				case ip4 == nil && !if6seen[iface.Index]:
+					if6 = append(if6, iface)
+					if6seen[iface.Index] = true
+				}
 			}
 		}
 	}
@@ -92,5 +110,5 @@ func IfAddrs() []*net.UDPAddr {
 		LogFatal("No local IP addresses found")
 	}
 
-	return addrs
+	return addrs, if4, if6
 }

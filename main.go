@@ -156,5 +156,5 @@ func optParse() {
 // The main function
 func main() {
 	optParse()
-	IfAddrs()
+	QueryRun()
 }
