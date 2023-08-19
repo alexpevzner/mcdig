@@ -212,6 +212,6 @@ func optParse() {
 // The main function
 func main() {
 	optParse()
-	QueryRun()
-	ResponseGetAndPrint(os.Stdout)
+	q := QueryRun()
+	ResponseGetAndPrint(os.Stdout, q)
 }

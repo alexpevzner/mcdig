@@ -17,7 +17,10 @@ import (
 )
 
 // QueryRun runs MDNS query
-func QueryRun() {
+//
+// It returns question section of the query message, which is
+// useful for response formatting
+func QueryRun() []dns.Question {
 	// Obtain local addresses and relevant interfaces
 	addrs, if4, if6 := IfAddrs()
 
@@ -113,6 +116,8 @@ func QueryRun() {
 		tmCount--
 		time.Sleep(OptTxPeriod)
 	}
+
+	return rq.Question
 }
 
 // queryNewQuestion creates q new request message

@@ -55,9 +55,25 @@ func ResponseGet() (ans, auth, add []dns.RR) {
 }
 
 // ResponsePrint prints responses into io.Writer
+// If question is not nil, it is assumed to be msg.Question
+// and used to format QUESTION PSEUDOSECTION (normally
+// missed in the MDNS queries
+//
 // The returned error, if any, comes from w.Write()
-func ResponsePrint(w io.Writer, ans, auth, add []dns.RR) error {
+func ResponsePrint(w io.Writer, question []dns.Question,
+	ans, auth, add []dns.RR) error {
 	buf := bytes.Buffer{}
+
+	// QUESTION PSEUDOSECTION
+	if question != nil {
+		buf.WriteString(";; QUESTION PSEUDOSECTION:\n")
+		for _, q := range question {
+			buf.WriteString(q.String())
+			buf.WriteByte('\n')
+		}
+
+		buf.WriteByte('\n')
+	}
 
 	// ANSWER SECTION
 	if ans != nil {
@@ -98,7 +114,7 @@ func ResponsePrint(w io.Writer, ans, auth, add []dns.RR) error {
 
 // ResponseGetAndPrint is the convenience wrapper for
 // ResponseGet + ResponsePrint
-func ResponseGetAndPrint(w io.Writer) error {
+func ResponseGetAndPrint(w io.Writer, question []dns.Question) error {
 	ans, auth, add := ResponseGet()
-	return ResponsePrint(w, ans, auth, add)
+	return ResponsePrint(w, question, ans, auth, add)
 }
