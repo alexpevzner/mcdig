@@ -73,7 +73,7 @@ func usage() {
 		"    -v         enable verbose debugging\n" +
 		"    -p period  MDNS query period, milliseconds (default is %d)\n" +
 		"    -c count   MDNS query count, before exit (default is %d)\n" +
-		"    -h print help screen and exit\n" +
+		"    -h         print help screen and exit\n" +
 		""
 
 	fmt.Printf(help, OptTxPeriod/time.Millisecond, OptTxCount)
