@@ -105,8 +105,7 @@ func QueryRun() {
 
 	for !done {
 		for _, conn := range conns {
-			is4 := conn.LocalAddr().(*net.UDPAddr).IP.To4() != nil
-			if is4 {
+			if AddrIs4(conn.LocalAddr().(*net.UDPAddr).IP) {
 				conn.WriteToUDP(rqBytes, mcast4)
 			} else {
 				conn.WriteToUDP(rqBytes, mcast6)

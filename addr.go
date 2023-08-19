@@ -40,3 +40,13 @@ func AddrIsLocal(addr net.IP) bool {
 func AddrIsLocalUDP(addr *net.UDPAddr) bool {
 	return AddrIsLocal(addr.IP)
 }
+
+// AddrIs4 tells if IP address is IPv4
+func AddrIs4(addr net.IP) bool {
+	return addr.To4() != nil
+}
+
+// AddrIs4UDP tells if UDP address is IPv4
+func AddrIs4UDP(addr *net.UDPAddr) bool {
+	return AddrIs4(addr.IP)
+}
