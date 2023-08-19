@@ -10,7 +10,7 @@ package main
 
 import "net"
 
-// IsLocalAddr tells if IP address is local (i.e., belongs to
+// AddrIsLocal tells if IP address is local (i.e., belongs to
 // one of local interfaces)
 func AddrIsLocal(addr net.IP) bool {
 	// Loopback address is definitely local
@@ -35,7 +35,7 @@ func AddrIsLocal(addr net.IP) bool {
 	return false
 }
 
-// IsLocalAddr tells if UDP address is local (i.e., belongs to
+// AddrIsLocalUDP tells if UDP address is local (i.e., belongs to
 // one of local interfaces)
 func AddrIsLocalUDP(addr *net.UDPAddr) bool {
 	return AddrIsLocal(addr.IP)

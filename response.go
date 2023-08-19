@@ -22,7 +22,7 @@ var (
 	rspLock       sync.Mutex // Access lock
 )
 
-// AnswerInput handles received messages
+// ResponseInput handles received messages
 func ResponseInput(rsp *dns.Msg) {
 	// We can be called from different goroutines, so
 	// locking is necessary
