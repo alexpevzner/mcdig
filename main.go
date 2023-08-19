@@ -42,11 +42,11 @@ var (
 	OptQueryTime = 2500 * time.Millisecond
 
 	// OptDebug enables debugging
-	OptDebug = true
+	OptDebug = false
 
 	// OptVerbose enables verbose debugging
 	// It implies OptDebug
-	OptVerbose = true
+	OptVerbose = false
 )
 
 // usage prints detailed usage and exits
@@ -64,6 +64,8 @@ func usage() {
 		"Options are:\n" +
 		"    -4 use IPv4 (the default, may be combined with -6)\n" +
 		"    -6 use IPv6 (may be combined with -4)\n" +
+		"    -d enable debugging\n" +
+		"    -v enable verbose debugging\n" +
 		"    -h print help screen and exit\n" +
 		""
 
@@ -145,6 +147,12 @@ func optParse() {
 
 		case opt == "-6":
 			Opt6 = true
+
+		case opt == "-d":
+			OptDebug = true
+
+		case opt == "-v":
+			OptVerbose = true
 
 		case strings.HasPrefix(opt, "@"):
 			if OptIface == "" {
