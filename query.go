@@ -12,6 +12,8 @@ import (
 	"net"
 	"syscall"
 	"time"
+
+	"github.com/miekg/dns"
 )
 
 // QueryRun runs MDNS query
@@ -89,7 +91,60 @@ func QueryRun() {
 		go queryRecv(conn)
 	}
 
-	time.Sleep(time.Second * 5)
+	// Create DNS query message
+	rq := queryNewRequest()
+	rqBytes, err := rq.Pack()
+	if err != nil {
+		LogFatal("%s: %s", OptDomain, err)
+	}
+
+	// Begin sending queries until time is expired
+	tmRxmt := time.NewTicker(OptRetransmitInterval)
+	tmDone := time.NewTimer(OptQueryTime)
+	done := false
+
+	for !done {
+		for _, conn := range conns {
+			is4 := conn.LocalAddr().(*net.UDPAddr).IP.To4() != nil
+			if is4 {
+				conn.WriteToUDP(rqBytes, mcast4)
+			} else {
+				conn.WriteToUDP(rqBytes, mcast6)
+			}
+		}
+
+		select {
+		case <-tmRxmt.C:
+		case <-tmDone.C:
+			done = true
+		}
+	}
+}
+
+// queryNewQuestion creates q new request message
+func queryNewRequest() *dns.Msg {
+	rq := &dns.Msg{}
+
+	// Make sure domain is FQDN
+	labels, ok := dns.IsDomainName(OptDomain)
+	if !ok {
+		LogFatal("%s: invalid domain name")
+	}
+
+	fqdn := OptDomain
+	if labels < 2 {
+		fqdn += ".local."
+	}
+
+	fqdn = dns.Fqdn(fqdn)
+
+	// Set question
+	rq.Id = dns.Id()
+	rq.RecursionDesired = false
+	rq.Question = make([]dns.Question, 1)
+	rq.Question[0] = dns.Question{fqdn, OptQType, OptQClass}
+
+	return rq
 }
 
 // queryRecv runs on its own goroutine and receives and handles

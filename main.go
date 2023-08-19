@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/miekg/dns"
 )
@@ -33,6 +34,12 @@ var (
 	// set, the default is used
 	Opt4 = false
 	Opt6 = false
+
+	// OptRetransmitInterval specifies MDNS query retransmit interval
+	OptRetransmitInterval = 250 * time.Millisecond
+
+	// OptQueryTime specifies the whole query wait time
+	OptQueryTime = 2500 * time.Millisecond
 
 	// OptDebug denables debugging
 	OptDebug = true
