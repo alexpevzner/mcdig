@@ -12,9 +12,16 @@ import (
 	"os"
 )
 
+// LogVerbose writes a verbose debug message
+func LogVerbose(format string, args ...interface{}) {
+	if OptVerbose {
+		fmt.Printf(format+"\n", args...)
+	}
+}
+
 // LogDebug writes a debug message
 func LogDebug(format string, args ...interface{}) {
-	if OptDebug {
+	if OptDebug || OptVerbose {
 		fmt.Printf(format+"\n", args...)
 	}
 }

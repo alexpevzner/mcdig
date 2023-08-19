@@ -41,8 +41,12 @@ var (
 	// OptQueryTime specifies the whole query wait time
 	OptQueryTime = 2500 * time.Millisecond
 
-	// OptDebug denables debugging
+	// OptDebug enables debugging
 	OptDebug = true
+
+	// OptVerbose enables verbose debugging
+	// It implies OptDebug
+	OptVerbose = true
 )
 
 // usage prints detailed usage and exits
@@ -164,4 +168,5 @@ func optParse() {
 func main() {
 	optParse()
 	QueryRun()
+	ResponseGetAndPrint(os.Stdout)
 }

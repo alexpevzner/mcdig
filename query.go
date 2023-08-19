@@ -153,11 +153,29 @@ func queryRecv(conn *net.UDPConn) {
 	buf := make([]byte, 65536)
 
 	for {
+		// Receive the message
 		n, from, err := conn.ReadFromUDP(buf)
 		if err != nil {
 			continue
 		}
 
-		LogDebug("%d bytes received from %s", n, from)
+		// Skip our own messages
+		if AddrIsLocalUDP(from) {
+			continue
+		}
+
+		LogVerbose("%d bytes received from %s", n, from)
+
+		// Parse response
+		rsp := &dns.Msg{}
+		err = rsp.Unpack(buf[:n])
+		if err != nil {
+			LogVerbose("Invalid message received from %s: %s",
+				from, err)
+			continue
+		}
+
+		// Process receiver response
+		ResponseInput(rsp)
 	}
 }
