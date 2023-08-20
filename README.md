@@ -1,6 +1,7 @@
 # MDIG
 
 ![GitHub](https://img.shields.io/github/license/alexpevzner/mdig)
+[![Go Report Card](https://goreportcard.com/badge/github.com/alexpevzner/mdig)](https://goreportcard.com/report/github.com/alexpevzner/mdig)
 
 MDIG is the simple multicast DNS lookup utility, similar to dig but
 much simplified
