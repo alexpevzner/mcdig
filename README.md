@@ -1,5 +1,7 @@
 # MDIG
 
+![GitHub](https://img.shields.io/github/license/github.com/alexpevzner/mdig)
+
 MDIG is the simple multicast DNS lookup utility, similar to dig but
 much simplified
 
