@@ -39,6 +39,30 @@ func ResponseInput(rsp *dns.Msg) {
 // section, removes duplicates and returns updated section
 func responseAppend(section, data []dns.RR) []dns.RR {
 	for _, rr := range data {
+		// Skip OPT PSEUDOSECTION records
+		//
+		// These records are messy on output and doesn't contain
+		// any information we need so far
+		//
+		// TODO: if eventually we will want to include these
+		// records, their formatting needs to be revisited
+		//
+		// (*dns.OPT) String() loogs to be unreliable for
+		// these records:
+		//
+		// --------------------------------------------------
+		// ;; OPT PSEUDOSECTION:
+		// ; EDNS: version 0; flags:; MBZ: 0x1194, udp: 1440
+		// ; ESU: �5�K
+		// /�5�K
+		// /
+		// --------------------------------------------------
+		//
+		// Please, notice the trailing junk
+		if _, ok := rr.(*dns.OPT); ok {
+			continue
+		}
+
 		// mDNS reuses upper bit of RR class as "unicast response"
 		// flag - so we must clear it before data is saved into
 		// our records
