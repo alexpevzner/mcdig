@@ -13,9 +13,9 @@ import "net"
 // queries
 //
 // It honors the following options:
-//   * OptIface
-//   * Opt4
-//   * Opt6
+//   - OptIface
+//   - Opt4
+//   - Opt6
 //
 // It returns (filtered, according to options) list of addresses
 // and two lists of network interfaces: one for IPv4 and one for
