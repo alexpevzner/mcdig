@@ -1,4 +1,4 @@
-module github.com/alexpevzner/mdig
+module github.com/alexpevzner/mcdig
 
 go 1.11
 

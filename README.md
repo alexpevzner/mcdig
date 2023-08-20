@@ -1,15 +1,15 @@
-# MDIG
+# MCDIG
 
-![GitHub](https://img.shields.io/github/license/alexpevzner/mdig)
-[![Go Report Card](https://goreportcard.com/badge/github.com/alexpevzner/mdig)](https://goreportcard.com/report/github.com/alexpevzner/mdig)
+![GitHub](https://img.shields.io/github/license/alexpevzner/mcdig)
+[![Go Report Card](https://goreportcard.com/badge/github.com/alexpevzner/mcdig)](https://goreportcard.com/report/github.com/alexpevzner/mcdig)
 
-MDIG is the simple multicast DNS lookup utility, similar to dig but
+MCDIG is the simple multicast DNS lookup utility, similar to dig but
 much simplified
 
 ## Usage
 
     Usage:
-        mdig [@interface] [options] domain [q-type] [q-class]
+        mcdig [@interface] [options] domain [q-type] [q-class]
 
     Options may be intermixed with other parameters.
     Use -- to terminate options list.

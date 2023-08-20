@@ -1,4 +1,4 @@
-// MDIG - DIG for MDNS (Multicast DNS lookup utility)
+// MCDIG - DIG for MDNS (Multicast DNS lookup utility)
 //
 // Copyright (C) 2023 and up by Alexander Pevzner (pzz@apevzner.com)
 // See LICENSE for license terms and conditions
@@ -58,7 +58,7 @@ var (
 func usage() {
 	const help = "" +
 		"Usage:\n" +
-		"    mdig [@interface] [options] domain [q-type] [q-class]\n" +
+		"    mcdig [@interface] [options] domain [q-type] [q-class]\n" +
 		"\n" +
 		"Options may be intermixed with other parameters.\n" +
 		"Use -- to terminate options list.\n" +
@@ -82,7 +82,7 @@ func usage() {
 
 // usageError prints usage error and exits
 func usageError(format string, args ...interface{}) {
-	fmt.Printf(format+"\n"+"Try mdig -h for more information\n", args...)
+	fmt.Printf(format+"\n"+"Try mcdig -h for more information\n", args...)
 	os.Exit(1)
 }
 

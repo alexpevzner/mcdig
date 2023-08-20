@@ -2,7 +2,7 @@ all:
 	go build
 
 clean:
-	rm -f mdns
+	rm -f mcdig
 
 vet:
 	go vet
