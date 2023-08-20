@@ -30,9 +30,24 @@ func ResponseInput(rsp *dns.Msg) {
 	defer rspLock.Unlock()
 
 	// Save RRs, deduplicate
-	rspAnswer = dns.Dedup(append(rspAnswer, rsp.Answer...), nil)
-	rspAuthority = dns.Dedup(append(rspAnswer, rsp.Ns...), nil)
-	rspAdditional = dns.Dedup(append(rspAnswer, rsp.Extra...), nil)
+	rspAnswer = responseAppend(rspAnswer, rsp.Answer)
+	rspAuthority = responseAppend(rspAnswer, rsp.Ns)
+	rspAdditional = responseAppend(rspAdditional, rsp.Extra)
+}
+
+// responseAppend appends newly received response data to the
+// section, removes duplicates and returns updated section
+func responseAppend(section, data []dns.RR) []dns.RR {
+	for _, rr := range data {
+		// mDNS reuses upper bit of RR class as "unicast response"
+		// flag - so we must clear it before data is saved into
+		// our records
+		rr2 := dns.Copy(rr)
+		rr2.Header().Class &^= 1 << 15
+
+		section = append(section, rr2)
+	}
+	return dns.Dedup(section, nil)
 }
 
 // ResponseGet returns responses, collected so far
