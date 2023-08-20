@@ -45,9 +45,25 @@ func QueryRun() []dns.Question {
 		Control: func(network, address string, c syscall.RawConn) error {
 			var err error
 			c.Control(func(fd uintptr) {
+				// SO_REUSEADDR is needed for coexistence
+				// with Avahi daemon
 				err = syscall.SetsockoptInt(int(fd),
 					syscall.SOL_SOCKET,
 					syscall.SO_REUSEADDR, 1)
+
+				// RFC 6762, section 11, requires TTL
+				// to be set to 255
+				if err == nil {
+					err = syscall.SetsockoptInt(int(fd),
+						syscall.IPPROTO_IP,
+						syscall.IP_TTL, 255)
+				}
+
+				if err == nil {
+					err = syscall.SetsockoptInt(int(fd),
+						syscall.IPPROTO_IP,
+						syscall.IP_MULTICAST_TTL, 255)
+				}
 			})
 			return err
 		},
