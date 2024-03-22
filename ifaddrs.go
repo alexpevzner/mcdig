@@ -88,8 +88,11 @@ func IfAddrs() (addrs []*net.UDPAddr, if4, if6 []net.Interface) {
 				addr := &net.UDPAddr{
 					IP:   ip,
 					Port: 5353,
-					Zone: iface.Name,
 				}
+				if ip4 == nil {
+					addr.Zone = iface.Name
+				}
+
 				addrs = append(addrs, addr)
 
 				switch {
