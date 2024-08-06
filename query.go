@@ -160,7 +160,7 @@ func queryNewRequest() *dns.Msg {
 	// Make sure domain is FQDN
 	labels, ok := dns.IsDomainName(OptDomain)
 	if !ok {
-		LogFatal("%s: invalid domain name")
+		LogFatal("%q: invalid domain name", OptDomain)
 	}
 
 	fqdn := OptDomain
