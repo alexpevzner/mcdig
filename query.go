@@ -205,11 +205,6 @@ func queryRecv(conn *net.UDPConn, wait *sync.WaitGroup) {
 			continue
 		}
 
-		// Skip our own messages
-		if AddrIsLocalUDP(from) {
-			continue
-		}
-
 		LogVerbose("%d bytes received from %s", n, from)
 
 		// Parse response
@@ -222,6 +217,8 @@ func queryRecv(conn *net.UDPConn, wait *sync.WaitGroup) {
 		}
 
 		// Process received response
-		ResponseInput(rsp)
+		if rsp.Response {
+			ResponseInput(rsp)
+		}
 	}
 }
